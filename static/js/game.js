@@ -1,16 +1,21 @@
-const config = {
-  type: Phaser.AUTO,
-  width: 512,
-  height: 544,
-  backgroundColor: 0x000000,
-  scene: [Scene1, Scene2],
-  pixelArt: true,
-  physics: {
-    default: "arcade",
-    arcade: {
-      debug: false
+let game;
+window.onload = function() {
+  const config = {
+    type: Phaser.AUTO,
+    width: 352,
+    height: 192,
+    backgroundColor: 0x000000,
+    scene: [Scene1, Scene2],
+    pixelArt: true,
+    physics: {
+      default: "arcade",
+      arcade: {
+        gravity: {
+          y: 0
+        }
+      }
     }
-  }
-};
+  };
 
-const game = new Phaser.Game(config);
+  game = new Phaser.Game(config);
+}

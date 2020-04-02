@@ -5,20 +5,35 @@ class Scene1 extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('background', 'public/assets/background.png');
-    // this.load.image('ship', 'public/assets/ship.png');
-    // this.load.image('ship2', 'public/assets/ship2.png');
-    // this.load.image('ship3', 'public/assets/ship3.png');
-
-    this.load.spritesheet('ship', 'public/assets/spritesheets/ship.png', {frameWidth: 16, frameHeight: 16});
-    this.load.spritesheet('ship2', 'public/assets/spritesheets/ship2.png', {frameWidth: 32, frameHeight: 16});
-    this.load.spritesheet('ship3', 'public/assets/spritesheets/ship3.png', {frameWidth: 32, frameHeight: 32});
-    this.load.spritesheet('explosion', 'public/assets/spritesheets/explosion.png', {frameWidth: 16, frameHeight: 16});
-    this.load.spritesheet('power-up', 'public/assets/spritesheets/power-up.png', {frameWidth: 16, frameHeight: 16});
+    this.load.image('far_bui', 'public/assets/spritesheets/far-buildings.png');
+    this.load.image('back_bui', 'public/assets/spritesheets/back-buildings.png');
+    this.load.image('foreGr', 'public/assets/spritesheets/foreground.png');
+    this.load.spritesheet("owl", "public/assets/spritesheets/Owlet_Monster_Walk_6.png", {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+    this.load.spritesheet("owl2", "public/assets/spritesheets/Owlet_Monster_Idle_4.png", {
+      frameWidth: 32,
+      frameHeight: 32
+    });
   }
 
   create() {
     this.add.text(20, 20, "Loading...");
+
+    this.anims.create({
+      key: "walk",
+      frames: this.anims.generateFrameNumbers("owl"),
+      frameRate: 20,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "idle",
+      frames: this.anims.generateFrameNumbers("owl2"),
+      frameRate: 20,
+      repeat: -1
+    });
+
     setTimeout(() => {
       this.scene.start("playGame");
     }, 1000);
