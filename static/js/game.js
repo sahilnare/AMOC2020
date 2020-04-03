@@ -36,13 +36,15 @@ window.addEventListener('DOMContentLoaded', function() {
 
     var sign = -1;
     var count = 0;
+    var rot = 0.05;
     scene.registerAfterRender(function(){
       if(count === 100.0) {
         count = 0;
         sign = -sign
       }
       count += 0.5;
-      myBox.translate(new BABYLON.Vector3(1, 0, 0).normalize(), 0.05*sign, BABYLON.Space.LOCAL);
+      myBox.translate(new BABYLON.Vector3(1, 0, 0).normalize(), 0.05*sign, BABYLON.Space.WORLD);
+      myBox.addRotation(0, rot, 0);
     });
 
     return scene;
