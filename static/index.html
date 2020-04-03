@@ -1,13 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Phaser Tutorial</title>
-  </head>
-  <body>
-    <script src="public/js/phaser.min.js"></script>
-    <script src="public/js/Scene1.js"></script>
-    <script src="public/js/Scene2.js"></script>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>Babylon Tutorial</title>
+
+        <style>
+            html, body {
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            #renderCanvas {
+                width: 100%;
+                height: 100%;
+                touch-action: none;
+            }
+        </style>
+
+        <!-- <script src="https://preview.babylonjs.com/babylon.js"></script> -->
+        <!-- <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script> -->
+        <!-- <script src="https://cdn.babylonjs.com/babylon.js"></script>
+        <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+        <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script> -->
+        <script src="public/js/babylonjs/babylon.min.js"></script>
+        <script src="public/js/babylonjs/babylon.loaders.min.js"></script>
+        <script src="public/js/babylonjs/jquery.pep.js"></script>
+    </head>
+
+   <body>
+
+    <canvas id="renderCanvas" touch-action="none"></canvas> //touch-action="none" for best results from PEP
+
     <script src="public/js/game.js"></script>
-  </body>
+
+   </body>
+
 </html>
