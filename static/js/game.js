@@ -20,8 +20,11 @@ window.addEventListener('DOMContentLoaded', function() {
     // Add and manipulate meshes in the scene
     var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameterX: 1, diameterY: 2, segments: 16}, scene);
     sphere.position.y = 2;
+    sphere.rotation.x = Math.PI/2;
+    sphere.scaling = new BABYLON.Vector3(2, 2, 2);
     var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {width: 1, height: 1, depth: 2}, scene);
-    myBox.position.y = 0.5;
+    myBox.position = new BABYLON.Vector3(0, 0.5, 0);
+    myBox.addRotation(0, Math.PI/2, 0);
     var myGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 6, height: 4, subdivisions: 4}, scene);
     var myPoints = [
       new BABYLON.Vector3(0, 0, 0),
@@ -30,6 +33,17 @@ window.addEventListener('DOMContentLoaded', function() {
     ];
     var lines = BABYLON.MeshBuilder.CreateLines("lines", {points: myPoints}, scene);
     // var myPlane = BABYLON.MeshBuilder.CreatePlane("myPlane", {width: 5, height: 2, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
+
+    var sign = -1;
+    var count = 0;
+    scene.registerAfterRender(function(){
+      if(count === 100.0) {
+        count = 0;
+        sign = -sign
+      }
+      count += 0.5;
+      myBox.translate(new BABYLON.Vector3(1, 0, 0).normalize(), 0.05*sign, BABYLON.Space.LOCAL);
+    });
 
     return scene;
   };
