@@ -16,6 +16,7 @@ window.addEventListener('DOMContentLoaded', function() {
     // Add lights to the scene
     var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
     var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
+    scene.ambientColor = new BABYLON.Color3(1, 1, 1);
 
     // Add and manipulate meshes in the scene
     var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameterX: 1, diameterY: 2, segments: 16}, scene);
@@ -33,6 +34,15 @@ window.addEventListener('DOMContentLoaded', function() {
     ];
     var lines = BABYLON.MeshBuilder.CreateLines("lines", {points: myPoints}, scene);
     // var myPlane = BABYLON.MeshBuilder.CreatePlane("myPlane", {width: 5, height: 2, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
+
+    // Add material to the meshes
+    var myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
+    myMaterial.diffuseColor = new BABYLON.Color3(0, 0, 1);
+    myMaterial.specularColor = new BABYLON.Color3(1, 0, 0);
+    myMaterial.emissiveColor = new BABYLON.Color3(0.3, 0, 0);
+    myMaterial.ambientColor = new BABYLON.Color3(0, 0.3, 0);
+
+    myBox.material = myMaterial;
 
     var sign = -1;
     var count = 0;
