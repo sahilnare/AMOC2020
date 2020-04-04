@@ -39,6 +39,9 @@ window.addEventListener('DOMContentLoaded', function() {
     ];
     var lines = BABYLON.MeshBuilder.CreateLines("lines", {points: myPoints}, scene);
     // var myPlane = BABYLON.MeshBuilder.CreatePlane("myPlane", {width: 5, height: 2, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
+    var billBoard = BABYLON.MeshBuilder.CreatePlane("plane", {height:2, width: 4, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
+    billBoard.position = new BABYLON.Vector3(4.5, 1, 0);
+    billBoard.addRotation(0, Math.PI/2, 0);
 
     // Add material to the meshes
     var myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
@@ -64,6 +67,14 @@ window.addEventListener('DOMContentLoaded', function() {
     rockMaterial.diffuseTexture.uScale = 6;
     rockMaterial.diffuseTexture.vScale = 6;
     rockGround.material = rockMaterial;
+
+    var billBoardTexture = new BABYLON.DynamicTexture("dynamic texture", {width:512, height:256}, scene);
+    var billBoardMaterial = new BABYLON.StandardMaterial("billBoardMaterial", scene);
+    billBoardMaterial.diffuseTexture = billBoardTexture;
+    billBoard.material = billBoardMaterial;
+    // Dynamic texture
+    var font = "bold 35px monospace";
+    billBoardTexture.drawText("F-Society welcomes you", 20, 135, font, "green", "white", true, true);
 
     // Translating meshes
     var sign = -1;
