@@ -23,10 +23,15 @@ window.addEventListener('DOMContentLoaded', function() {
     sphere.position.y = 2;
     sphere.rotation.x = Math.PI/2;
     sphere.scaling = new BABYLON.Vector3(2, 2, 2);
+
     var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {width: 1, height: 1, depth: 2}, scene);
     myBox.position = new BABYLON.Vector3(0, 0.5, 0);
     myBox.addRotation(0, Math.PI/2, 0);
-    var myGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 6, height: 4, subdivisions: 4}, scene);
+
+    var myGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 6, height: 6, subdivisions: 1}, scene);
+    var rockGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 6, height: 6, subdivisions: 1}, scene);
+    rockGround.translate(new BABYLON.Vector3(1, 0, 0).normalize(), 6, BABYLON.Space.WORLD);
+
     var myPoints = [
       new BABYLON.Vector3(0, 0, 0),
       new BABYLON.Vector3(0, 5, 5),
@@ -44,6 +49,23 @@ window.addEventListener('DOMContentLoaded', function() {
 
     myBox.material = myMaterial;
 
+    var grassMaterial = new BABYLON.StandardMaterial("grassMaterial", scene);
+    grassMaterial.specularColor = new BABYLON.Color3(0.5, 1, 0.5);
+    grassMaterial.diffuseTexture = new BABYLON.Texture("public/assets/grass.png", scene);
+    grassMaterial.bumpTexture = new BABYLON.Texture("public/assets/grassn.png", scene);
+    grassMaterial.diffuseTexture.uScale = 2;
+    grassMaterial.diffuseTexture.vScale = 2;
+    myGround.material = grassMaterial;
+
+    var rockMaterial = new BABYLON.StandardMaterial("rockMaterial", scene);
+    rockMaterial.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+    rockMaterial.diffuseTexture = new BABYLON.Texture("public/assets/rock.png", scene);
+    rockMaterial.bumpTexture = new BABYLON.Texture("public/assets/rockn.png", scene);
+    rockMaterial.diffuseTexture.uScale = 6;
+    rockMaterial.diffuseTexture.vScale = 6;
+    rockGround.material = rockMaterial;
+
+    // Translating meshes
     var sign = -1;
     var count = 0;
     var rot = 0.05;
