@@ -83,33 +83,55 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // Follow Camera
     // Parameters: name, position, scene
-    var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(0, 3, 5), scene);
-    // The goal distance of camera from target
-    camera.radius = 20;
-    // The goal height of camera above local origin (centre) of target
-    camera.heightOffset = 10;
-    // The goal rotation of camera around local origin (centre) of target in x y plane
+    var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(5, 3, 0), scene);
+    // var camera = new BABYLON.ArcFollowCamera("Camera", 0, Math.PI / 3, 5, myBox, scene);
+    camera.radius = 10;
+    camera.heightOffset = 6;
     camera.rotationOffset = 0;
-    // Acceleration of camera in moving from current to goal position
-    camera.cameraAcceleration = 0.005
-    // The speed at which acceleration is halted
-    camera.maxCameraSpeed = 5
-    // This attaches the camera to the canvas
+    camera.cameraAcceleration = 0.03
+    camera.maxCameraSpeed = 30
     camera.attachControl(canvas, true);
-    // targetMesh created here.
-    camera.lockedTarget = myBox; //version 2.5 onward
+    camera.lockedTarget = myBox;
+
+    camera.detachControl(canvas);
+
+    // Action Manager
+    var map ={}; //object for multiple key presses
+    scene.actionManager = new BABYLON.ActionManager(scene);
+
+    scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
+      map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+    }));
+
+    scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, function (evt) {
+      map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+    }));
 
     // Translating meshes
     var sign = -1;
     var count = 0;
     var rot = 0.05;
     scene.registerAfterRender(function(){
-      if(count === 100.0) {
-        count = 0;
-        sign = -sign
+      // Controls
+      if(map["w"] || map["W"]) {
+        myBox.translate(new BABYLON.Vector3(0, 0, 1).normalize(), -0.1, BABYLON.Space.LOCAL);
       }
-      count += 0.5;
-      myBox.translate(new BABYLON.Vector3(1, 0, 0).normalize(), 0.05*sign, BABYLON.Space.WORLD);
+      if(map["s"] || map["S"]) {
+        myBox.translate(new BABYLON.Vector3(0, 0, 1).normalize(), 0.1, BABYLON.Space.LOCAL);
+      }
+      if(map["a"] || map["A"]) {
+        myBox.addRotation(0, -rot, 0);
+      }
+      if(map["d"] || map["D"]) {
+        myBox.addRotation(0, rot, 0);
+      }
+
+      // if(count === 100.0) {
+      //   count = 0;
+      //   sign = -sign
+      // }
+      // count += 0.5;
+      // myBox.translate(new BABYLON.Vector3(1, 0, 0).normalize(), 0.05*sign, BABYLON.Space.WORLD);
       // myBox.addRotation(0, rot, 0);
     });
 
