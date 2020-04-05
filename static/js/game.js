@@ -97,7 +97,9 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // Action Manager
     var map ={}; //object for multiple key presses
+    var lightsOn = true;
     scene.actionManager = new BABYLON.ActionManager(scene);
+    myBox.actionManager = new BABYLON.ActionManager(scene);
 
     scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
       map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
@@ -105,6 +107,14 @@ window.addEventListener('DOMContentLoaded', function() {
 
     scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, function (evt) {
       map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+    }));
+
+    myBox.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickDownTrigger, function (evt) {
+      lightsOn = !lightsOn;
+      if(!lightsOn) {
+        light1.setEnabled(false);
+        light2.setEnabled(false);
+      }
     }));
 
     // Translating meshes
