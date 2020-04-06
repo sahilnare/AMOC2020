@@ -34,8 +34,8 @@ window.addEventListener('DOMContentLoaded', function() {
     // sphere.rotation.x = Math.PI/2;
     // sphere.scaling = new BABYLON.Vector3(2, 2, 2);
 
-    var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {width: 1, height: 2, depth: 1}, scene);
-    myBox.position = new BABYLON.Vector3(0, 0.5, 0);
+    var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {width: 1, height: 1.5, depth: 1}, scene);
+    myBox.position = new BABYLON.Vector3(10, 0.75, 0);
     myBox.addRotation(0, -Math.PI/2, 0);
 
     var myGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 60, height: 60, subdivisions: 1}, scene);
@@ -89,9 +89,8 @@ window.addEventListener('DOMContentLoaded', function() {
     billBoardTexture.drawText("F-Society welcomes you", 20, 135, font, "green", "white", true, true);
 
     // Follow Camera
-    // Parameters: name, position, scene
-    var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(-5, 3, 0), scene);
     // var camera = new BABYLON.ArcFollowCamera("Camera", 0, Math.PI / 3, 5, myBox, scene);
+    var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(-5, 3, 0), scene);
     camera.radius = 10;
     camera.heightOffset = 5;
     camera.rotationOffset = 0;
@@ -99,17 +98,93 @@ window.addEventListener('DOMContentLoaded', function() {
     camera.maxCameraSpeed = 30
     camera.attachControl(canvas, true);
     camera.lockedTarget = myBox;
-
     camera.detachControl(canvas);
 
     // Shadow Generator
-    var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
-    shadowGenerator.getShadowMap().renderList.push(myBox);
-    myGround.receiveShadows = true;
+    // var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
+    // shadowGenerator.getShadowMap().renderList.push(myBox);
+    // myGround.receiveShadows = true;
     // shadowGenerator.useExponentialShadowMap = true;
     // shadowGenerator.usePoissonSampling = true;
     // shadowGenerator.useBlurExponentialShadowMap = true;
-    shadowGenerator.usePercentageCloserFiltering = true;
+    // shadowGenerator.usePercentageCloserFiltering = true;
+    // shadowGenerator.filteringQuality = BABYLON.ShadowGenerator.QUALITY_LOW;
+
+    // Assets Manager
+    var assetsManager = new BABYLON.AssetsManager(scene);
+    var meshTask = assetsManager.addMeshTask("loadMesh", "", "public/assets/", "solus_knight.gltf");
+
+    // var solus = BABYLON.MeshBuilder.CreateBox("solus", {width: 1, height: 1, depth: 1}, scene);
+
+    meshTask.onSuccess = function (task) {
+      task.loadedMeshes.forEach((item, i) => {
+        item.position = BABYLON.Vector3.Zero();
+        item.addRotation(0, Math.PI, 0);
+        item.translate(new BABYLON.Vector3(0, 1, 0).normalize(), -1, BABYLON.Space.LOCAL);
+        // item.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
+        item.parent = myBox;
+      });
+      // task.loadedMeshes[1].position = BABYLON.Vector3.Zero();
+      // task.loadedMeshes[1].parent = solus;
+  	  // task.loadedMeshes[0].scaling = new BABYLON.Vector3(0.05, 0.05, 0.05);
+      console.log("Mesh loaded!");
+      console.log(task.loadedMeshes);
+      console.log(scene.animationGroups);
+      // scene.stopAllAnimations();
+      // scene.getAnimationGroupByName("knight_idle_heavy_weapon").play(true);
+      scene.getAnimationGroupByName("knight_idle").play(true);
+  	}
+
+    meshTask.onError = function (task, message, exception) {
+        console.log(message, exception);
+    }
+
+    assetsManager.onFinish = function (tasks) {
+  		engine.runRenderLoop(function () {
+  			scene.render();
+  		});
+  	};
+
+    myBox.isVisible = false;
+
+    assetsManager.load();
+
+    // Animation
+    // var testBox = BABYLON.MeshBuilder.CreateBox("test", {width: 1, height: 1, depth: 1}, scene);
+    // testBox.position = new BABYLON.Vector3(0, 0.5, 10);
+    // var animationBox = new BABYLON.Animation("myAnimation", "scaling.x", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+    //
+    // var keys = [];
+    //
+    // keys.push({
+    //   frame: 0,
+    //   value: 1
+    // });
+    // keys.push({
+    //   frame: 20,
+    //   value: 0.2
+    // });
+    // keys.push({
+    //   frame: 100,
+    //   value: 1
+    // });
+    //
+    // animationBox.setKeys(keys);
+    //
+    // testBox.animations = [];
+    // testBox.animations.push(animationBox);
+    //
+    // scene.beginAnimation(testBox, 0, 100, true);
+
+    // Physics engine
+    var gravityVector = new BABYLON.Vector3(0,-9.81, 0);
+    var physicsPlugin = new BABYLON.CannonJSPlugin();
+    scene.enablePhysics(gravityVector, physicsPlugin);
+
+    myBox.physicsImpostor = new BABYLON.PhysicsImpostor(myBox, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 0.5 }, scene);
+	  myGround.physicsImpostor = new BABYLON.PhysicsImpostor(myGround, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.5 }, scene);
+
+
 
     // Action Manager
     var map ={}; //object for multiple key presses
@@ -137,7 +212,8 @@ window.addEventListener('DOMContentLoaded', function() {
     // Translating meshes
     var sign = -1;
     var count = 0;
-    var rot = 0.05;
+    var rot = 0.02;
+
     scene.registerAfterRender(function(){
       // Controls
       if(map["w"] || map["W"]) {
