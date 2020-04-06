@@ -19,30 +19,35 @@ window.addEventListener('DOMContentLoaded', function() {
     // camera.attachControl(canvas, true);
 
     // Add lights to the scene
-    var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
-    var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
+    var light = new BABYLON.DirectionalLight("DirectionalLight", new BABYLON.Vector3(0.4, -1, 0.5), scene);
+    light.intensity = 1.3;
+    light.position = new BABYLON.Vector3(-80, 50, -100);
+    var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 0, 0), scene);
+    var lightSphere = BABYLON.MeshBuilder.CreateSphere("lightSphere", {diameter: 10}, scene);
+    lightSphere.position = new BABYLON.Vector3(-80, 50, -100);
+    // var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
     scene.ambientColor = new BABYLON.Color3(1, 1, 1);
 
     // Add and manipulate meshes in the scene
-    var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameterX: 1, diameterY: 2, segments: 16}, scene);
-    sphere.position.y = 2;
-    sphere.rotation.x = Math.PI/2;
-    sphere.scaling = new BABYLON.Vector3(2, 2, 2);
+    // var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameterX: 1, diameterY: 2, segments: 16}, scene);
+    // sphere.position.y = 2;
+    // sphere.rotation.x = Math.PI/2;
+    // sphere.scaling = new BABYLON.Vector3(2, 2, 2);
 
-    var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {width: 1, height: 1, depth: 2}, scene);
+    var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {width: 1, height: 2, depth: 1}, scene);
     myBox.position = new BABYLON.Vector3(0, 0.5, 0);
-    myBox.addRotation(0, Math.PI/2, 0);
+    myBox.addRotation(0, -Math.PI/2, 0);
 
-    var myGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 6, height: 6, subdivisions: 1}, scene);
-    var rockGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 6, height: 6, subdivisions: 1}, scene);
-    rockGround.translate(new BABYLON.Vector3(1, 0, 0).normalize(), 6, BABYLON.Space.WORLD);
+    var myGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 60, height: 60, subdivisions: 1}, scene);
+    // var rockGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 6, height: 6, subdivisions: 1}, scene);
+    // rockGround.translate(new BABYLON.Vector3(1, 0, 0).normalize(), 6, BABYLON.Space.WORLD);
 
-    var myPoints = [
-      new BABYLON.Vector3(0, 0, 0),
-      new BABYLON.Vector3(0, 5, 5),
-      new BABYLON.Vector3(0, 5, 0)
-    ];
-    var lines = BABYLON.MeshBuilder.CreateLines("lines", {points: myPoints}, scene);
+    // var myPoints = [
+    //   new BABYLON.Vector3(0, 0, 0),
+    //   new BABYLON.Vector3(0, 5, 5),
+    //   new BABYLON.Vector3(0, 5, 0)
+    // ];
+    // var lines = BABYLON.MeshBuilder.CreateLines("lines", {points: myPoints}, scene);
     // var myPlane = BABYLON.MeshBuilder.CreatePlane("myPlane", {width: 5, height: 2, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
     var billBoard = BABYLON.MeshBuilder.CreatePlane("plane", {height:2, width: 4, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
     billBoard.position = new BABYLON.Vector3(4.5, 1, 0);
@@ -60,18 +65,20 @@ window.addEventListener('DOMContentLoaded', function() {
     var grassMaterial = new BABYLON.StandardMaterial("grassMaterial", scene);
     grassMaterial.specularColor = new BABYLON.Color3(0.5, 1, 0.5);
     grassMaterial.diffuseTexture = new BABYLON.Texture("public/assets/grass.png", scene);
-    grassMaterial.bumpTexture = new BABYLON.Texture("public/assets/grassn.png", scene);
-    grassMaterial.diffuseTexture.uScale = 2;
-    grassMaterial.diffuseTexture.vScale = 2;
+    // grassMaterial.bumpTexture = new BABYLON.Texture("public/assets/grassn.png", scene);
+    grassMaterial.diffuseTexture.uScale = 15;
+    grassMaterial.diffuseTexture.vScale = 15;
+    // grassMaterial.bumpTexture.uScale = 10;
+    // grassMaterial.bumpTexture.vScale = 10;
     myGround.material = grassMaterial;
 
-    var rockMaterial = new BABYLON.StandardMaterial("rockMaterial", scene);
-    rockMaterial.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-    rockMaterial.diffuseTexture = new BABYLON.Texture("public/assets/rock.png", scene);
-    rockMaterial.bumpTexture = new BABYLON.Texture("public/assets/rockn.png", scene);
-    rockMaterial.diffuseTexture.uScale = 6;
-    rockMaterial.diffuseTexture.vScale = 6;
-    rockGround.material = rockMaterial;
+    // var rockMaterial = new BABYLON.StandardMaterial("rockMaterial", scene);
+    // rockMaterial.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+    // rockMaterial.diffuseTexture = new BABYLON.Texture("public/assets/rock.png", scene);
+    // rockMaterial.bumpTexture = new BABYLON.Texture("public/assets/rockn.png", scene);
+    // rockMaterial.diffuseTexture.uScale = 6;
+    // rockMaterial.diffuseTexture.vScale = 6;
+    // rockGround.material = rockMaterial;
 
     var billBoardTexture = new BABYLON.DynamicTexture("dynamic texture", {width:512, height:256}, scene);
     var billBoardMaterial = new BABYLON.StandardMaterial("billBoardMaterial", scene);
@@ -83,10 +90,10 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // Follow Camera
     // Parameters: name, position, scene
-    var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(5, 3, 0), scene);
+    var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(-5, 3, 0), scene);
     // var camera = new BABYLON.ArcFollowCamera("Camera", 0, Math.PI / 3, 5, myBox, scene);
     camera.radius = 10;
-    camera.heightOffset = 6;
+    camera.heightOffset = 5;
     camera.rotationOffset = 0;
     camera.cameraAcceleration = 0.03
     camera.maxCameraSpeed = 30
@@ -94,6 +101,15 @@ window.addEventListener('DOMContentLoaded', function() {
     camera.lockedTarget = myBox;
 
     camera.detachControl(canvas);
+
+    // Shadow Generator
+    var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
+    shadowGenerator.getShadowMap().renderList.push(myBox);
+    myGround.receiveShadows = true;
+    // shadowGenerator.useExponentialShadowMap = true;
+    // shadowGenerator.usePoissonSampling = true;
+    // shadowGenerator.useBlurExponentialShadowMap = true;
+    shadowGenerator.usePercentageCloserFiltering = true;
 
     // Action Manager
     var map ={}; //object for multiple key presses
@@ -113,7 +129,8 @@ window.addEventListener('DOMContentLoaded', function() {
       lightsOn = !lightsOn;
       if(!lightsOn) {
         light1.setEnabled(false);
-        light2.setEnabled(false);
+      } else {
+        light1.setEnabled(true);
       }
     }));
 
