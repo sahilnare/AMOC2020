@@ -34,8 +34,8 @@ window.addEventListener('DOMContentLoaded', function() {
     // sphere.rotation.x = Math.PI/2;
     // sphere.scaling = new BABYLON.Vector3(2, 2, 2);
 
-    var myBox = BABYLON.MeshBuilder.CreateBox("myBox", {width: 1, height: 1.5, depth: 1}, scene);
-    myBox.position = new BABYLON.Vector3(10, 0.75, 0);
+    var myBox = BABYLON.MeshBuilder.CreateCylinder("cylinder", {height: 2, diameterTop: 1, diameterBottom: 1.5}, scene);
+    myBox.position = new BABYLON.Vector3(10, 3, 0);
     myBox.addRotation(0, -Math.PI/2, 0);
 
     var myGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 60, height: 60, subdivisions: 1}, scene);
@@ -91,8 +91,8 @@ window.addEventListener('DOMContentLoaded', function() {
     // Follow Camera
     // var camera = new BABYLON.ArcFollowCamera("Camera", 0, Math.PI / 3, 5, myBox, scene);
     var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(-5, 3, 0), scene);
-    camera.radius = 10;
-    camera.heightOffset = 5;
+    camera.radius = 7;
+    camera.heightOffset = 4;
     camera.rotationOffset = 0;
     camera.cameraAcceleration = 0.03
     camera.maxCameraSpeed = 30
@@ -120,18 +120,19 @@ window.addEventListener('DOMContentLoaded', function() {
       task.loadedMeshes.forEach((item, i) => {
         item.position = BABYLON.Vector3.Zero();
         item.addRotation(0, Math.PI, 0);
-        item.translate(new BABYLON.Vector3(0, 1, 0).normalize(), -1, BABYLON.Space.LOCAL);
+        item.translate(new BABYLON.Vector3(0, 1, 0).normalize(), -0.85, BABYLON.Space.LOCAL);
         // item.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
         item.parent = myBox;
       });
       // task.loadedMeshes[1].position = BABYLON.Vector3.Zero();
       // task.loadedMeshes[1].parent = solus;
   	  // task.loadedMeshes[0].scaling = new BABYLON.Vector3(0.05, 0.05, 0.05);
+
       console.log("Mesh loaded!");
-      console.log(task.loadedMeshes);
+      // console.log(task.loadedMeshes);
       console.log(scene.animationGroups);
+
       // scene.stopAllAnimations();
-      // scene.getAnimationGroupByName("knight_idle_heavy_weapon").play(true);
       scene.getAnimationGroupByName("knight_idle").play(true);
   	}
 
@@ -146,6 +147,7 @@ window.addEventListener('DOMContentLoaded', function() {
   	};
 
     myBox.isVisible = false;
+    // myMaterial.alpha = 0.5;
 
     assetsManager.load();
 
@@ -181,11 +183,12 @@ window.addEventListener('DOMContentLoaded', function() {
     var physicsPlugin = new BABYLON.CannonJSPlugin();
     scene.enablePhysics(gravityVector, physicsPlugin);
 
-    myBox.physicsImpostor = new BABYLON.PhysicsImpostor(myBox, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 0.5 }, scene);
-	  myGround.physicsImpostor = new BABYLON.PhysicsImpostor(myGround, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.5 }, scene);
+    myBox.physicsImpostor = new BABYLON.PhysicsImpostor(myBox, BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 2, restitution: 0.1 }, scene);
+	  myGround.physicsImpostor = new BABYLON.PhysicsImpostor(myGround, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.1 }, scene);
 
-
-
+    myEnemy = BABYLON.MeshBuilder.CreateCylinder("cylinder", {height: 2, diameterTop: 1, diameterBottom: 1.5}, scene);
+    myEnemy.position = new BABYLON.Vector3(1, 2, 0);
+    myEnemy.physicsImpostor = new BABYLON.PhysicsImpostor(myEnemy, BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 2, restitution: 0.1 }, scene);
     // Action Manager
     var map ={}; //object for multiple key presses
     var lightsOn = true;
@@ -214,19 +217,70 @@ window.addEventListener('DOMContentLoaded', function() {
     var count = 0;
     var rot = 0.02;
 
+    var isMoving = false;
+
     scene.registerAfterRender(function(){
       // Controls
+      isMoving = false;
+      // console.log(myBox.getChildMeshes());
+
       if(map["w"] || map["W"]) {
         myBox.translate(new BABYLON.Vector3(0, 0, 1).normalize(), -0.1, BABYLON.Space.LOCAL);
+        if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
+          if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
+            scene.getAnimationGroupByName("knight_idle").stop();
+            // console.log("Walking");
+          }
+          scene.getAnimationGroupByName("knight_walk_in_place").play(true);
+        }
+        isMoving = true;
       }
       if(map["s"] || map["S"]) {
         myBox.translate(new BABYLON.Vector3(0, 0, 1).normalize(), 0.1, BABYLON.Space.LOCAL);
+        if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
+          if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
+            scene.getAnimationGroupByName("knight_idle").stop();
+          }
+          scene.getAnimationGroupByName("knight_walk_in_place").play(true);
+        }
+        isMoving = true;
       }
       if(map["a"] || map["A"]) {
         myBox.addRotation(0, -rot, 0);
+        if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
+          if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
+            scene.getAnimationGroupByName("knight_idle").stop();
+          }
+          scene.getAnimationGroupByName("knight_walk_in_place").play(true);
+        }
+        isMoving = true;
       }
       if(map["d"] || map["D"]) {
         myBox.addRotation(0, rot, 0);
+        if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
+          if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
+            scene.getAnimationGroupByName("knight_idle").stop();
+          }
+          scene.getAnimationGroupByName("knight_walk_in_place").play(true);
+        }
+        isMoving = true;
+      }
+      if(map[" "]) {
+        if(myBox.position.y <= 1.1) {
+          myBox.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,4,0));
+        }
+        isMoving = true;
+      }
+      else {
+        if(meshTask.isCompleted && !isMoving) {
+          if(!scene.getAnimationGroupByName("knight_idle").isPlaying) {
+            // console.log("Idle");
+            if(scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
+              scene.getAnimationGroupByName("knight_walk_in_place").stop();
+            }
+            scene.getAnimationGroupByName("knight_idle").play(true);
+          }
+        }
       }
 
       // if(count === 100.0) {
