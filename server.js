@@ -12,7 +12,11 @@ app.get('/', function (req, res) {
 });
 
 io.on('connection', function (socket) {
-  console.log('a user connected');
+  console.log(`A user connected: ${socket.id}`);
+
+  socket.on('disconnect', function () {
+    console.log(`User ${socket.id} disconnected`);
+  });
 });
 
 server.listen(port, function () {

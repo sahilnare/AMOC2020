@@ -4,19 +4,13 @@ window.addEventListener('DOMContentLoaded', function() {
   var canvas = document.getElementById("renderCanvas"); // Get the canvas element
   var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 
+  // Socket config
+  var socket = io();
+
   /******* Add the create scene function ******/
   var createScene = function () {
     // Create the scene space
     var scene = new BABYLON.Scene(engine);
-
-    // Add a camera to the scene and attach it to the canvas
-    // var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON.Vector3(0,0,5), scene);
-    // camera.setPosition(new BABYLON.Vector3(0, 0, 20));
-    // camera.attachControl(canvas, true);
-    // Universal camera
-    // var camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 0, -10), scene);
-    // camera.setTarget(BABYLON.Vector3.Zero());
-    // camera.attachControl(canvas, true);
 
     // Add lights to the scene
     var light = new BABYLON.DirectionalLight("DirectionalLight", new BABYLON.Vector3(0.4, -1, 0.5), scene);
@@ -25,30 +19,15 @@ window.addEventListener('DOMContentLoaded', function() {
     var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 0, 0), scene);
     var lightSphere = BABYLON.MeshBuilder.CreateSphere("lightSphere", {diameter: 10}, scene);
     lightSphere.position = new BABYLON.Vector3(-80, 50, -100);
-    // var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
     scene.ambientColor = new BABYLON.Color3(1, 1, 1);
 
     // Add and manipulate meshes in the scene
-    // var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameterX: 1, diameterY: 2, segments: 16}, scene);
-    // sphere.position.y = 2;
-    // sphere.rotation.x = Math.PI/2;
-    // sphere.scaling = new BABYLON.Vector3(2, 2, 2);
 
     var myBox = BABYLON.MeshBuilder.CreateCylinder("cylinder", {height: 2, diameterTop: 1, diameterBottom: 1.5}, scene);
     myBox.position = new BABYLON.Vector3(10, 3, 0);
     myBox.addRotation(0, -Math.PI/2, 0);
 
     var myGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 60, height: 60, subdivisions: 1}, scene);
-    // var rockGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 6, height: 6, subdivisions: 1}, scene);
-    // rockGround.translate(new BABYLON.Vector3(1, 0, 0).normalize(), 6, BABYLON.Space.WORLD);
-
-    // var myPoints = [
-    //   new BABYLON.Vector3(0, 0, 0),
-    //   new BABYLON.Vector3(0, 5, 5),
-    //   new BABYLON.Vector3(0, 5, 0)
-    // ];
-    // var lines = BABYLON.MeshBuilder.CreateLines("lines", {points: myPoints}, scene);
-    // var myPlane = BABYLON.MeshBuilder.CreatePlane("myPlane", {width: 5, height: 2, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
     var billBoard = BABYLON.MeshBuilder.CreatePlane("plane", {height:2, width: 4, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
     billBoard.position = new BABYLON.Vector3(4.5, 1, 0);
     billBoard.addRotation(0, Math.PI/2, 0);
@@ -65,20 +44,10 @@ window.addEventListener('DOMContentLoaded', function() {
     var grassMaterial = new BABYLON.StandardMaterial("grassMaterial", scene);
     grassMaterial.specularColor = new BABYLON.Color3(0.5, 1, 0.5);
     grassMaterial.diffuseTexture = new BABYLON.Texture("public/assets/grass.png", scene);
-    // grassMaterial.bumpTexture = new BABYLON.Texture("public/assets/grassn.png", scene);
     grassMaterial.diffuseTexture.uScale = 15;
     grassMaterial.diffuseTexture.vScale = 15;
-    // grassMaterial.bumpTexture.uScale = 10;
-    // grassMaterial.bumpTexture.vScale = 10;
     myGround.material = grassMaterial;
 
-    // var rockMaterial = new BABYLON.StandardMaterial("rockMaterial", scene);
-    // rockMaterial.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-    // rockMaterial.diffuseTexture = new BABYLON.Texture("public/assets/rock.png", scene);
-    // rockMaterial.bumpTexture = new BABYLON.Texture("public/assets/rockn.png", scene);
-    // rockMaterial.diffuseTexture.uScale = 6;
-    // rockMaterial.diffuseTexture.vScale = 6;
-    // rockGround.material = rockMaterial;
 
     var billBoardTexture = new BABYLON.DynamicTexture("dynamic texture", {width:512, height:256}, scene);
     var billBoardMaterial = new BABYLON.StandardMaterial("billBoardMaterial", scene);
@@ -88,8 +57,7 @@ window.addEventListener('DOMContentLoaded', function() {
     var font = "bold 35px monospace";
     billBoardTexture.drawText("F-Society welcomes you", 20, 135, font, "green", "white", true, true);
 
-    // Follow Camera
-    // var camera = new BABYLON.ArcFollowCamera("Camera", 0, Math.PI / 3, 5, myBox, scene);
+    // Add a camera to the scene and attach it to the canvas
     var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(-5, 3, 0), scene);
     camera.radius = 7;
     camera.heightOffset = 4;
@@ -114,24 +82,16 @@ window.addEventListener('DOMContentLoaded', function() {
     var assetsManager = new BABYLON.AssetsManager(scene);
     var meshTask = assetsManager.addMeshTask("loadMesh", "", "public/assets/", "solus_knight.gltf");
 
-    // var solus = BABYLON.MeshBuilder.CreateBox("solus", {width: 1, height: 1, depth: 1}, scene);
-
     meshTask.onSuccess = function (task) {
       task.loadedMeshes.forEach((item, i) => {
         item.position = BABYLON.Vector3.Zero();
         item.addRotation(0, Math.PI, 0);
         item.translate(new BABYLON.Vector3(0, 1, 0).normalize(), -0.85, BABYLON.Space.LOCAL);
-        // item.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
         item.parent = myBox;
       });
-      // task.loadedMeshes[1].position = BABYLON.Vector3.Zero();
-      // task.loadedMeshes[1].parent = solus;
-  	  // task.loadedMeshes[0].scaling = new BABYLON.Vector3(0.05, 0.05, 0.05);
 
       console.log("Mesh loaded!");
-      // console.log(task.loadedMeshes);
       console.log(scene.animationGroups);
-
       // scene.stopAllAnimations();
       scene.getAnimationGroupByName("knight_idle").play(true);
   	}
@@ -151,33 +111,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
     assetsManager.load();
 
-    // Animation
-    // var testBox = BABYLON.MeshBuilder.CreateBox("test", {width: 1, height: 1, depth: 1}, scene);
-    // testBox.position = new BABYLON.Vector3(0, 0.5, 10);
-    // var animationBox = new BABYLON.Animation("myAnimation", "scaling.x", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
-    //
-    // var keys = [];
-    //
-    // keys.push({
-    //   frame: 0,
-    //   value: 1
-    // });
-    // keys.push({
-    //   frame: 20,
-    //   value: 0.2
-    // });
-    // keys.push({
-    //   frame: 100,
-    //   value: 1
-    // });
-    //
-    // animationBox.setKeys(keys);
-    //
-    // testBox.animations = [];
-    // testBox.animations.push(animationBox);
-    //
-    // scene.beginAnimation(testBox, 0, 100, true);
-
     // Physics engine
     var gravityVector = new BABYLON.Vector3(0,-9.81, 0);
     var physicsPlugin = new BABYLON.CannonJSPlugin();
@@ -189,6 +122,7 @@ window.addEventListener('DOMContentLoaded', function() {
     myEnemy = BABYLON.MeshBuilder.CreateCylinder("cylinder", {height: 2, diameterTop: 1, diameterBottom: 1.5}, scene);
     myEnemy.position = new BABYLON.Vector3(1, 2, 0);
     myEnemy.physicsImpostor = new BABYLON.PhysicsImpostor(myEnemy, BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 2, restitution: 0.1 }, scene);
+
     // Action Manager
     var map ={}; //object for multiple key presses
     var lightsOn = true;
@@ -203,15 +137,6 @@ window.addEventListener('DOMContentLoaded', function() {
       map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
     }));
 
-    myBox.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickDownTrigger, function (evt) {
-      lightsOn = !lightsOn;
-      if(!lightsOn) {
-        light1.setEnabled(false);
-      } else {
-        light1.setEnabled(true);
-      }
-    }));
-
     // Translating meshes
     var sign = -1;
     var count = 0;
@@ -220,16 +145,15 @@ window.addEventListener('DOMContentLoaded', function() {
     var isMoving = false;
 
     scene.registerAfterRender(function(){
+
       // Controls
       isMoving = false;
-      // console.log(myBox.getChildMeshes());
 
       if(map["w"] || map["W"]) {
         myBox.translate(new BABYLON.Vector3(0, 0, 1).normalize(), -0.1, BABYLON.Space.LOCAL);
         if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
           if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
             scene.getAnimationGroupByName("knight_idle").stop();
-            // console.log("Walking");
           }
           scene.getAnimationGroupByName("knight_walk_in_place").play(true);
         }
@@ -274,7 +198,6 @@ window.addEventListener('DOMContentLoaded', function() {
       else {
         if(meshTask.isCompleted && !isMoving) {
           if(!scene.getAnimationGroupByName("knight_idle").isPlaying) {
-            // console.log("Idle");
             if(scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
               scene.getAnimationGroupByName("knight_walk_in_place").stop();
             }
@@ -283,13 +206,6 @@ window.addEventListener('DOMContentLoaded', function() {
         }
       }
 
-      // if(count === 100.0) {
-      //   count = 0;
-      //   sign = -sign
-      // }
-      // count += 0.5;
-      // myBox.translate(new BABYLON.Vector3(1, 0, 0).normalize(), 0.05*sign, BABYLON.Space.WORLD);
-      // myBox.addRotation(0, rot, 0);
     });
 
     return scene;
