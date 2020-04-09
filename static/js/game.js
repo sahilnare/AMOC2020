@@ -1,11 +1,8 @@
 
-window.addEventListener('DOMContentLoaded', function() {
+function babylonInit() {
 
   var canvas = document.getElementById("renderCanvas"); // Get the canvas element
   var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
-
-  // Socket config
-  var socket = io();
 
   /******* Add the create scene function ******/
   var createScene = function () {
@@ -79,37 +76,37 @@ window.addEventListener('DOMContentLoaded', function() {
     // shadowGenerator.filteringQuality = BABYLON.ShadowGenerator.QUALITY_LOW;
 
     // Assets Manager
-    var assetsManager = new BABYLON.AssetsManager(scene);
-    var meshTask = assetsManager.addMeshTask("loadMesh", "", "public/assets/", "solus_knight.gltf");
-
-    meshTask.onSuccess = function (task) {
-      task.loadedMeshes.forEach((item, i) => {
-        item.position = BABYLON.Vector3.Zero();
-        item.addRotation(0, Math.PI, 0);
-        item.translate(new BABYLON.Vector3(0, 1, 0).normalize(), -0.85, BABYLON.Space.LOCAL);
-        item.parent = myBox;
-      });
-
-      console.log("Mesh loaded!");
-      console.log(scene.animationGroups);
-      // scene.stopAllAnimations();
-      scene.getAnimationGroupByName("knight_idle").play(true);
-  	}
-
-    meshTask.onError = function (task, message, exception) {
-        console.log(message, exception);
-    }
-
-    assetsManager.onFinish = function (tasks) {
-  		engine.runRenderLoop(function () {
-  			scene.render();
-  		});
-  	};
-
-    myBox.isVisible = false;
-    // myMaterial.alpha = 0.5;
-
-    assetsManager.load();
+    // var assetsManager = new BABYLON.AssetsManager(scene);
+    // var meshTask = assetsManager.addMeshTask("loadMesh", "", "public/assets/", "solus_knight.gltf");
+    //
+    // meshTask.onSuccess = function (task) {
+    //   task.loadedMeshes.forEach((item, i) => {
+    //     item.position = BABYLON.Vector3.Zero();
+    //     item.addRotation(0, Math.PI, 0);
+    //     item.translate(new BABYLON.Vector3(0, 1, 0).normalize(), -0.85, BABYLON.Space.LOCAL);
+    //     item.parent = myBox;
+    //   });
+    //
+    //   console.log("Mesh loaded!");
+    //   console.log(scene.animationGroups);
+    //   // scene.stopAllAnimations();
+    //   scene.getAnimationGroupByName("knight_idle").play(true);
+  	// }
+    //
+    // meshTask.onError = function (task, message, exception) {
+    //     console.log(message, exception);
+    // }
+    //
+    // assetsManager.onFinish = function (tasks) {
+  	// 	engine.runRenderLoop(function () {
+  	// 		scene.render();
+  	// 	});
+  	// };
+    //
+    // myBox.isVisible = false;
+    // // myMaterial.alpha = 0.5;
+    //
+    // assetsManager.load();
 
     // Physics engine
     var gravityVector = new BABYLON.Vector3(0,-9.81, 0);
@@ -151,42 +148,42 @@ window.addEventListener('DOMContentLoaded', function() {
 
       if(map["w"] || map["W"]) {
         myBox.translate(new BABYLON.Vector3(0, 0, 1).normalize(), -0.1, BABYLON.Space.LOCAL);
-        if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
-          if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
-            scene.getAnimationGroupByName("knight_idle").stop();
-          }
-          scene.getAnimationGroupByName("knight_walk_in_place").play(true);
-        }
+        // if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
+        //   if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
+        //     scene.getAnimationGroupByName("knight_idle").stop();
+        //   }
+        //   scene.getAnimationGroupByName("knight_walk_in_place").play(true);
+        // }
         isMoving = true;
       }
       if(map["s"] || map["S"]) {
         myBox.translate(new BABYLON.Vector3(0, 0, 1).normalize(), 0.1, BABYLON.Space.LOCAL);
-        if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
-          if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
-            scene.getAnimationGroupByName("knight_idle").stop();
-          }
-          scene.getAnimationGroupByName("knight_walk_in_place").play(true);
-        }
+        // if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
+        //   if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
+        //     scene.getAnimationGroupByName("knight_idle").stop();
+        //   }
+        //   scene.getAnimationGroupByName("knight_walk_in_place").play(true);
+        // }
         isMoving = true;
       }
       if(map["a"] || map["A"]) {
         myBox.addRotation(0, -rot, 0);
-        if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
-          if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
-            scene.getAnimationGroupByName("knight_idle").stop();
-          }
-          scene.getAnimationGroupByName("knight_walk_in_place").play(true);
-        }
+        // if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
+        //   if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
+        //     scene.getAnimationGroupByName("knight_idle").stop();
+        //   }
+        //   scene.getAnimationGroupByName("knight_walk_in_place").play(true);
+        // }
         isMoving = true;
       }
       if(map["d"] || map["D"]) {
         myBox.addRotation(0, rot, 0);
-        if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
-          if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
-            scene.getAnimationGroupByName("knight_idle").stop();
-          }
-          scene.getAnimationGroupByName("knight_walk_in_place").play(true);
-        }
+        // if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
+        //   if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
+        //     scene.getAnimationGroupByName("knight_idle").stop();
+        //   }
+        //   scene.getAnimationGroupByName("knight_walk_in_place").play(true);
+        // }
         isMoving = true;
       }
       if(map[" "]) {
@@ -196,14 +193,14 @@ window.addEventListener('DOMContentLoaded', function() {
         isMoving = true;
       }
       else {
-        if(meshTask.isCompleted && !isMoving) {
-          if(!scene.getAnimationGroupByName("knight_idle").isPlaying) {
-            if(scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
-              scene.getAnimationGroupByName("knight_walk_in_place").stop();
-            }
-            scene.getAnimationGroupByName("knight_idle").play(true);
-          }
-        }
+        // if(meshTask.isCompleted && !isMoving) {
+        //   if(!scene.getAnimationGroupByName("knight_idle").isPlaying) {
+        //     if(scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
+        //       scene.getAnimationGroupByName("knight_walk_in_place").stop();
+        //     }
+        //     scene.getAnimationGroupByName("knight_idle").play(true);
+        //   }
+        // }
       }
 
     });
@@ -215,7 +212,9 @@ window.addEventListener('DOMContentLoaded', function() {
   var scene = createScene(); //Call the createScene function
 
   // Register a render loop to repeatedly render the scene
+  // engine.displayLoadingUI();
   engine.runRenderLoop(function () {
+    // engine.hideLoadingUI();
     scene.render();
   });
 
@@ -224,4 +223,4 @@ window.addEventListener('DOMContentLoaded', function() {
     engine.resize();
   });
 
-});
+}
