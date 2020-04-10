@@ -1,6 +1,6 @@
 
 /******* Add the create scene function ******/
-var createScene = function (engine, canvas) {
+var createScene = function (engine, canvas, playerInfo) {
   // Create the scene space
   var scene = new BABYLON.Scene(engine);
 
@@ -13,26 +13,25 @@ var createScene = function (engine, canvas) {
   lightSphere.position = new BABYLON.Vector3(-80, 50, -100);
   scene.ambientColor = new BABYLON.Color3(1, 1, 1);
 
+  // Physics engine
+  var gravityVector = new BABYLON.Vector3(0,-9.81, 0);
+  var physicsPlugin = new BABYLON.CannonJSPlugin();
+  scene.enablePhysics(gravityVector, physicsPlugin);
+
   // Add and manipulate meshes in the scene
-
-  var myBox = BABYLON.MeshBuilder.CreateCylinder("cylinder", {height: 2, diameterTop: 1, diameterBottom: 1.5}, scene);
-  myBox.position = new BABYLON.Vector3(10, 3, 0);
-  myBox.addRotation(0, -Math.PI/2, 0);
-
-  var myGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 60, height: 60, subdivisions: 1}, scene);
-  var billBoard = BABYLON.MeshBuilder.CreatePlane("plane", {height:2, width: 4, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
-  billBoard.position = new BABYLON.Vector3(4.5, 1, 0);
-  billBoard.addRotation(0, Math.PI/2, 0);
-
   // Add material to the meshes
+
   var myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
   myMaterial.diffuseColor = new BABYLON.Color3(0, 0, 1);
   myMaterial.specularColor = new BABYLON.Color3(1, 0, 0);
   myMaterial.emissiveColor = new BABYLON.Color3(0.3, 0, 0);
   myMaterial.ambientColor = new BABYLON.Color3(0, 0.3, 0);
 
-  myBox.material = myMaterial;
+  var myPlayer = createPlayer(scene, myMaterial, {x: playerInfo.x, y: playerInfo.y, z: playerInfo.z}, playerInfo.playerId, playerInfo.rotation);
 
+  // var enemyPlayer = createPlayer(scene, myMaterial, {x: -10, y: 3, z: 0});
+
+  var myGround = BABYLON.MeshBuilder.CreateGround("myGround", {width: 60, height: 60, subdivisions: 1}, scene);
   var grassMaterial = new BABYLON.StandardMaterial("grassMaterial", scene);
   grassMaterial.specularColor = new BABYLON.Color3(0.5, 1, 0.5);
   grassMaterial.diffuseTexture = new BABYLON.Texture("public/assets/grass.png", scene);
@@ -40,7 +39,9 @@ var createScene = function (engine, canvas) {
   grassMaterial.diffuseTexture.vScale = 15;
   myGround.material = grassMaterial;
 
-
+  var billBoard = BABYLON.MeshBuilder.CreatePlane("plane", {height:2, width: 4, sideOrientation: BABYLON.Mesh.DOUBLESIDE}, scene);
+  billBoard.position = new BABYLON.Vector3(4.5, 1, 0);
+  billBoard.addRotation(0, Math.PI/2, 0);
   var billBoardTexture = new BABYLON.DynamicTexture("dynamic texture", {width:512, height:256}, scene);
   var billBoardMaterial = new BABYLON.StandardMaterial("billBoardMaterial", scene);
   billBoardMaterial.diffuseTexture = billBoardTexture;
@@ -57,12 +58,12 @@ var createScene = function (engine, canvas) {
   camera.cameraAcceleration = 0.03
   camera.maxCameraSpeed = 30
   camera.attachControl(canvas, true);
-  camera.lockedTarget = myBox;
+  camera.lockedTarget = myPlayer;
   camera.detachControl(canvas);
 
   // Shadow Generator
   // var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
-  // shadowGenerator.getShadowMap().renderList.push(myBox);
+  // shadowGenerator.getShadowMap().renderList.push(myPlayer);
   // myGround.receiveShadows = true;
   // shadowGenerator.useExponentialShadowMap = true;
   // shadowGenerator.usePoissonSampling = true;
@@ -79,7 +80,7 @@ var createScene = function (engine, canvas) {
   //     item.position = BABYLON.Vector3.Zero();
   //     item.addRotation(0, Math.PI, 0);
   //     item.translate(new BABYLON.Vector3(0, 1, 0).normalize(), -0.85, BABYLON.Space.LOCAL);
-  //     item.parent = myBox;
+  //     item.parent = myPlayer;
   //   });
   //
   //   console.log("Mesh loaded!");
@@ -98,28 +99,22 @@ var createScene = function (engine, canvas) {
   // 	});
   // };
   //
-  // myBox.isVisible = false;
+  // myPlayer.isVisible = false;
   // // myMaterial.alpha = 0.5;
   //
   // assetsManager.load();
 
-  // Physics engine
-  var gravityVector = new BABYLON.Vector3(0,-9.81, 0);
-  var physicsPlugin = new BABYLON.CannonJSPlugin();
-  scene.enablePhysics(gravityVector, physicsPlugin);
 
-  myBox.physicsImpostor = new BABYLON.PhysicsImpostor(myBox, BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 2, restitution: 0.1 }, scene);
   myGround.physicsImpostor = new BABYLON.PhysicsImpostor(myGround, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.1 }, scene);
 
-  myEnemy = BABYLON.MeshBuilder.CreateCylinder("cylinder", {height: 2, diameterTop: 1, diameterBottom: 1.5}, scene);
-  myEnemy.position = new BABYLON.Vector3(1, 2, 0);
-  myEnemy.physicsImpostor = new BABYLON.PhysicsImpostor(myEnemy, BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 2, restitution: 0.1 }, scene);
+  // myEnemy = BABYLON.MeshBuilder.CreateCylinder("cylinder", {height: 2, diameterTop: 1, diameterBottom: 1.5}, scene);
+  // myEnemy.position = new BABYLON.Vector3(1, 2, 0);
+  // myEnemy.physicsImpostor = new BABYLON.PhysicsImpostor(myEnemy, BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 2, restitution: 0.1 }, scene);
 
   // Action Manager
   var map ={}; //object for multiple key presses
   var lightsOn = true;
   scene.actionManager = new BABYLON.ActionManager(scene);
-  myBox.actionManager = new BABYLON.ActionManager(scene);
 
   scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
     map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
@@ -136,13 +131,23 @@ var createScene = function (engine, canvas) {
 
   var isMoving = false;
 
+  // save old position data
+  var oldPosition = {
+    x: myPlayer.position.x,
+    y: myPlayer.position.y,
+    z: myPlayer.position.z,
+    rotation: myPlayer.rotation
+  };
+
+  console.log(oldPosition);
+
   scene.registerAfterRender(function(){
 
     // Controls
     isMoving = false;
 
     if(map["w"] || map["W"]) {
-      myBox.translate(new BABYLON.Vector3(0, 0, 1).normalize(), -0.1, BABYLON.Space.LOCAL);
+      myPlayer.translate(new BABYLON.Vector3(0, 0, 1).normalize(), -0.1, BABYLON.Space.LOCAL);
       // if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
       //   if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
       //     scene.getAnimationGroupByName("knight_idle").stop();
@@ -152,7 +157,7 @@ var createScene = function (engine, canvas) {
       isMoving = true;
     }
     if(map["s"] || map["S"]) {
-      myBox.translate(new BABYLON.Vector3(0, 0, 1).normalize(), 0.1, BABYLON.Space.LOCAL);
+      myPlayer.translate(new BABYLON.Vector3(0, 0, 1).normalize(), 0.1, BABYLON.Space.LOCAL);
       // if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
       //   if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
       //     scene.getAnimationGroupByName("knight_idle").stop();
@@ -162,7 +167,7 @@ var createScene = function (engine, canvas) {
       isMoving = true;
     }
     if(map["a"] || map["A"]) {
-      myBox.addRotation(0, -rot, 0);
+      myPlayer.addRotation(0, -rot, 0);
       // if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
       //   if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
       //     scene.getAnimationGroupByName("knight_idle").stop();
@@ -172,7 +177,7 @@ var createScene = function (engine, canvas) {
       isMoving = true;
     }
     if(map["d"] || map["D"]) {
-      myBox.addRotation(0, rot, 0);
+      myPlayer.addRotation(0, rot, 0);
       // if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
       //   if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
       //     scene.getAnimationGroupByName("knight_idle").stop();
@@ -182,8 +187,8 @@ var createScene = function (engine, canvas) {
       isMoving = true;
     }
     if(map[" "]) {
-      if(myBox.position.y <= 1.1) {
-        myBox.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,4,0));
+      if(myPlayer.position.y <= 1.1) {
+        myPlayer.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,4,0));
       }
       isMoving = true;
     }
@@ -197,6 +202,18 @@ var createScene = function (engine, canvas) {
       //   }
       // }
     }
+
+    if (Math.abs(myPlayer.position.x - oldPosition.x) >= 0.05 || Math.abs(myPlayer.position.y - oldPosition.y) >= 0.05 || Math.abs(myPlayer.position.z - oldPosition.z) >= 0.05 || Math.abs(myPlayer.rotation.x - oldPosition.rotation.x) >= 0.01 || Math.abs(myPlayer.rotation.y - oldPosition.rotation.y) >= 0.01 || Math.abs(myPlayer.rotation.z - oldPosition.rotation.z) >= 0.01) {
+      console.log(myPlayer.rotationQuaternion);
+      // socket.emit('playerMovement', { x: myPlayer.position.x, y: myPlayer.position.y, z: myPlayer.position.z, rotation: myPlayer.rotation });
+    }
+
+    oldPosition = {
+      x: myPlayer.position.x,
+      y: myPlayer.position.y,
+      z: myPlayer.position.z,
+      rotation: myPlayer.rotation
+    };
 
   });
 
