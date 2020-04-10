@@ -128,6 +128,7 @@ var createScene = function (engine, canvas, playerInfo) {
   var sign = -1;
   var count = 0;
   var rot = 0.02;
+  var tor = 0.0;
 
   var isMoving = false;
 
@@ -168,6 +169,12 @@ var createScene = function (engine, canvas, playerInfo) {
     }
     if(map["a"] || map["A"]) {
       myPlayer.addRotation(0, -rot, 0);
+
+      // myPlayer.rotate(BABYLON.Axis.Y, -rot, BABYLON.Space.WORLD);
+
+      // tor = myPlayer.rotation.y - rot;
+      // myPlayer.rotation = new BABYLON.Vector3(0, tor, 0);
+
       // if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
       //   if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
       //     scene.getAnimationGroupByName("knight_idle").stop();
@@ -178,6 +185,12 @@ var createScene = function (engine, canvas, playerInfo) {
     }
     if(map["d"] || map["D"]) {
       myPlayer.addRotation(0, rot, 0);
+
+      // myPlayer.rotate(BABYLON.Axis.Y, rot, BABYLON.Space.WORLD);
+
+      // tor = myPlayer.rotation.y + rot;
+      // myPlayer.rotation = new BABYLON.Vector3(0, tor, 0);
+
       // if(!scene.getAnimationGroupByName("knight_walk_in_place").isPlaying) {
       //   if(scene.getAnimationGroupByName("knight_idle").isPlaying) {
       //     scene.getAnimationGroupByName("knight_idle").stop();
@@ -203,16 +216,21 @@ var createScene = function (engine, canvas, playerInfo) {
       // }
     }
 
-    if (Math.abs(myPlayer.position.x - oldPosition.x) >= 0.05 || Math.abs(myPlayer.position.y - oldPosition.y) >= 0.05 || Math.abs(myPlayer.position.z - oldPosition.z) >= 0.05 || Math.abs(myPlayer.rotation.x - oldPosition.rotation.x) >= 0.01 || Math.abs(myPlayer.rotation.y - oldPosition.rotation.y) >= 0.01 || Math.abs(myPlayer.rotation.z - oldPosition.rotation.z) >= 0.01) {
-      console.log(myPlayer.rotationQuaternion);
-      // socket.emit('playerMovement', { x: myPlayer.position.x, y: myPlayer.position.y, z: myPlayer.position.z, rotation: myPlayer.rotation });
+    if (Math.abs(myPlayer.position.x - oldPosition.x) >= 0.05 || Math.abs(myPlayer.position.y - oldPosition.y) >= 0.05 || Math.abs(myPlayer.position.z - oldPosition.z) >= 0.05 || Math.abs(myPlayer.rotationQuaternion.toEulerAngles().y - oldPosition.rotation.y) >= 0.01) {
+      // console.log(myPlayer.rotationQuaternion.toEulerAngles().y);
+      // console.log(myPlayer.rotationQuaternion.toEulerAngles().y);
+      socket.emit('playerMovement', { x: myPlayer.position.x, y: myPlayer.position.y, z: myPlayer.position.z, rotation: { x: 0, y: myPlayer.rotationQuaternion.toEulerAngles().y, z: 0 } });
     }
 
     oldPosition = {
       x: myPlayer.position.x,
       y: myPlayer.position.y,
       z: myPlayer.position.z,
-      rotation: myPlayer.rotation
+      rotation: {
+        x: 0,
+        y: myPlayer.rotationQuaternion.toEulerAngles().y,
+        z: 0,
+      }
     };
 
   });

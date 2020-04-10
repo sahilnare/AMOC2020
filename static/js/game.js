@@ -28,7 +28,10 @@ function babylonInit(socket) {
   });
 
   socket.on('playerMoved', function (playerInfo) {
-    console.log("Player moved!");
+    scene.getMeshByName(playerInfo.playerId).position = new BABYLON.Vector3(playerInfo.x, playerInfo.y, playerInfo.z);
+    var rotDiff = playerInfo.rotation.y - scene.getMeshByName(playerInfo.playerId).rotationQuaternion.toEulerAngles().y;
+    // console.log(rotDiff);
+    scene.getMeshByName(playerInfo.playerId).addRotation(0, rotDiff, 0);
   });
 
   socket.on('newPlayer', function (playerInfo) {
