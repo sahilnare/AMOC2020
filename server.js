@@ -18,10 +18,10 @@ io.on('connection', function (socket) {
   console.log(`A user connected: ${socket.id}`);
 
   // create a new player and add it to our players object
-  player[socket.id] = {
+  players[socket.id] = {
     rotation: 0,
-    x: Math.floor(Math.random() * 700) + 50,
-    y: Math.floor(Math.random() * 500) + 50,
+    x: Math.floor(Math.random() * 15) + 10,
+    y: Math.floor(Math.random() * 15) + 10,
     playerId: socket.id
   };
 

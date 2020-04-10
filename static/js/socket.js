@@ -4,7 +4,7 @@ var socket;
 function socketInit() {
   socket = io().connect();
   socket.on('connect', function() {
-    babylonInit();
+    babylonInit(socket);
   });
 }
 
