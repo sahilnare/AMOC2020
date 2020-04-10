@@ -29,9 +29,10 @@ function babylonInit(socket) {
 
   socket.on('playerMoved', function (playerInfo) {
     scene.getMeshByName(playerInfo.playerId).position = new BABYLON.Vector3(playerInfo.x, playerInfo.y, playerInfo.z);
-    var rotDiff = playerInfo.rotation.y - scene.getMeshByName(playerInfo.playerId).rotationQuaternion.toEulerAngles().y;
-    // console.log(rotDiff);
-    scene.getMeshByName(playerInfo.playerId).addRotation(0, rotDiff, 0);
+    scene.getMeshByName(playerInfo.playerId).rotation = new BABYLON.Vector3(playerInfo.rotation.x, playerInfo.rotation.y, playerInfo.rotation.z);
+
+    // var rotDiff = playerInfo.rotation.y - scene.getMeshByName(playerInfo.playerId).rotationQuaternion.toEulerAngles().y;
+    // scene.getMeshByName(playerInfo.playerId).addRotation(0, rotDiff, 0);
   });
 
   socket.on('newPlayer', function (playerInfo) {
@@ -47,7 +48,7 @@ function babylonInit(socket) {
   this.socket.on('disconnect', function (playerId) {
     playersArray.forEach(function (otherPlayer) {
       if (playerId === otherPlayer.playerId) {
-        scene.getMeshByName(otherPlayer.playerId).physicsImpostor.dispose();
+        // scene.getMeshByName(otherPlayer.playerId).physicsImpostor.dispose();
         scene.removeMesh(scene.getMeshByName(otherPlayer.playerId));
         console.log("Removed Player", otherPlayer);
         playersArray.splice(playersArray.indexOf(otherPlayer), 1);
