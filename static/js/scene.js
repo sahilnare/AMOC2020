@@ -14,9 +14,9 @@ var createScene = function (engine, canvas, playerInfo) {
   scene.ambientColor = new BABYLON.Color3(1, 1, 1);
 
   // Physics engine
-  // var gravityVector = new BABYLON.Vector3(0,-9.81, 0);
-  // var physicsPlugin = new BABYLON.CannonJSPlugin();
-  // scene.enablePhysics(gravityVector, physicsPlugin);
+  var gravityVector = new BABYLON.Vector3(0,-9.81, 0);
+  var physicsPlugin = new BABYLON.CannonJSPlugin();
+  scene.enablePhysics(gravityVector, physicsPlugin);
 
   // Add and manipulate meshes in the scene
   // Add material to the meshes
@@ -61,6 +61,12 @@ var createScene = function (engine, canvas, playerInfo) {
   camera.lockedTarget = myPlayer;
   camera.detachControl(canvas);
 
+  // Gravity and collisions
+  // scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
+  // scene.collisionsEnabled = true;
+  // myGround.checkCollisions = true;
+  // myPlayer.checkCollisions = true;
+
   // Shadow Generator
   // var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
   // shadowGenerator.getShadowMap().renderList.push(myPlayer);
@@ -99,14 +105,19 @@ var createScene = function (engine, canvas, playerInfo) {
   // 	});
   // };
   //
-  // myPlayer.isVisible = false;
-  // // myMaterial.alpha = 0.5;
+  // // myPlayer.isVisible = false;
+  // myMaterial.alpha = 0.6;
   //
   // assetsManager.load();
 
-
-  // myGround.physicsImpostor = new BABYLON.PhysicsImpostor(myGround, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.1 }, scene);
-
+  myGround.physicsImpostor = new BABYLON.PhysicsImpostor(myGround, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.1 }, scene);
+  // var myEnemy = BABYLON.MeshBuilder.CreateCylinder("cylinder", {height: 2, diameterTop: 1, diameterBottom: 1.5}, scene);
+  // myEnemy.position = new BABYLON.Vector3(1, 2, 0);
+  // myEnemy.physicsImpostor = new BABYLON.PhysicsImpostor(myEnemy, BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 2, restitution: 0.1 }, scene);
+  // var myCollide = function(collider, collideAgainst) {
+  //   console.log("Collide!");
+  // }
+  // myPlayer.physicsImpostor.registerOnPhysicsCollide(myEnemy.physicsImpostor, myCollide);
 
   // Action Manager
   var map ={}; //object for multiple key presses
@@ -126,6 +137,7 @@ var createScene = function (engine, canvas, playerInfo) {
   var count = 0;
   var rot = 0.02;
   var tor = 0.0;
+  var yaw = 0.0;
 
   var isMoving = false;
 
@@ -136,8 +148,6 @@ var createScene = function (engine, canvas, playerInfo) {
     z: myPlayer.position.z,
     rotation: myPlayer.rotation
   };
-
-  console.log(oldPosition);
 
   scene.registerAfterRender(function(){
 
@@ -165,7 +175,10 @@ var createScene = function (engine, canvas, playerInfo) {
       isMoving = true;
     }
     if(map["a"] || map["A"]) {
-      myPlayer.addRotation(0, -rot, 0);
+      yaw -= rot;
+      myPlayer.rotationQuaternion = BABYLON.Quaternion.RotationYawPitchRoll(yaw, 0, 0);
+
+      // myPlayer.addRotation(0, -rot, 0);
 
       // myPlayer.rotate(BABYLON.Axis.Y, -rot, BABYLON.Space.WORLD);
 
@@ -181,7 +194,10 @@ var createScene = function (engine, canvas, playerInfo) {
       isMoving = true;
     }
     if(map["d"] || map["D"]) {
-      myPlayer.addRotation(0, rot, 0);
+      yaw += rot;
+      myPlayer.rotationQuaternion = BABYLON.Quaternion.RotationYawPitchRoll(yaw, 0, 0);
+
+      // myPlayer.addRotation(0, rot, 0);
 
       // myPlayer.rotate(BABYLON.Axis.Y, rot, BABYLON.Space.WORLD);
 
@@ -198,7 +214,7 @@ var createScene = function (engine, canvas, playerInfo) {
     }
     if(map[" "]) {
       if(myPlayer.position.y <= 1.1) {
-        // myPlayer.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,4,0));
+        myPlayer.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,4,0));
       }
       isMoving = true;
     }
@@ -213,12 +229,11 @@ var createScene = function (engine, canvas, playerInfo) {
       // }
     }
 
-    if (Math.abs(myPlayer.position.x - oldPosition.x) >= 0.02 || Math.abs(myPlayer.position.y - oldPosition.y) >= 0.02 || Math.abs(myPlayer.position.z - oldPosition.z) >= 0.02 || Math.abs(myPlayer.rotation.y - oldPosition.rotation.y) >= 0.01) {
+    if (Math.abs(myPlayer.position.x - oldPosition.x) >= 0.02 || Math.abs(myPlayer.position.y - oldPosition.y) >= 0.02 || Math.abs(myPlayer.position.z - oldPosition.z) >= 0.02 || Math.abs(myPlayer.rotationQuaternion.toEulerAngles().y - oldPosition.rotation.y) >= 0.01) {
       // console.log(myPlayer.rotationQuaternion.toEulerAngles().y);
-      // console.log(myPlayer.rotationQuaternion.toEulerAngles().y);
-      socket.emit('playerMovement', { x: myPlayer.position.x, y: myPlayer.position.y, z: myPlayer.position.z, rotation: { x: 0, y: myPlayer.rotation.y, z: 0 } });
+      socket.emit('playerMovement', { x: myPlayer.position.x, y: myPlayer.position.y, z: myPlayer.position.z, rotation: { x: 0, y: myPlayer.rotationQuaternion.toEulerAngles().y, z: 0 } });
     }
-    // console.log(myPlayer.rotation);
+    // console.log(myPlayer.rotationQuaternion.toEulerAngles().y, yaw);
 
     oldPosition = {
       x: myPlayer.position.x,
@@ -226,7 +241,7 @@ var createScene = function (engine, canvas, playerInfo) {
       z: myPlayer.position.z,
       rotation: {
         x: 0,
-        y: myPlayer.rotation.y,
+        y: myPlayer.rotationQuaternion.toEulerAngles().y,
         z: 0,
       }
     };

@@ -29,10 +29,11 @@ function babylonInit(socket) {
 
   socket.on('playerMoved', function (playerInfo) {
     scene.getMeshByName(playerInfo.playerId).position = new BABYLON.Vector3(playerInfo.x, playerInfo.y, playerInfo.z);
-    scene.getMeshByName(playerInfo.playerId).rotation = new BABYLON.Vector3(playerInfo.rotation.x, playerInfo.rotation.y, playerInfo.rotation.z);
+    // scene.getMeshByName(playerInfo.playerId).rotation = new BABYLON.Vector3(playerInfo.rotation.x, playerInfo.rotation.y, playerInfo.rotation.z);
 
     // var rotDiff = playerInfo.rotation.y - scene.getMeshByName(playerInfo.playerId).rotationQuaternion.toEulerAngles().y;
     // scene.getMeshByName(playerInfo.playerId).addRotation(0, rotDiff, 0);
+    scene.getMeshByName(playerInfo.playerId).rotationQuaternion = BABYLON.Quaternion.RotationYawPitchRoll(playerInfo.rotation.y, 0, 0);
   });
 
   socket.on('newPlayer', function (playerInfo) {
