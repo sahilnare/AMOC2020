@@ -27,6 +27,12 @@ var createScene = function (engine, canvas, playerInfo) {
   myMaterial.emissiveColor = new BABYLON.Color3(0.3, 0, 0);
   myMaterial.ambientColor = new BABYLON.Color3(0, 0.3, 0);
 
+  var playerTorsoMaterial = new BABYLON.StandardMaterial("playerMaterial", scene);
+  playerTorsoMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
+
+  var playerLegsMaterial = new BABYLON.StandardMaterial("playerMaterial", scene);
+  playerLegsMaterial.diffuseColor = new BABYLON.Color3(0, 1, 0);
+
   var myPlayer = createPlayer(scene, myMaterial, {x: playerInfo.x, y: playerInfo.y, z: playerInfo.z}, playerInfo.playerId, playerInfo.rotation);
 
   // var enemyPlayer = createPlayer(scene, myMaterial, {x: -10, y: 3, z: 0});
@@ -78,39 +84,48 @@ var createScene = function (engine, canvas, playerInfo) {
   // shadowGenerator.filteringQuality = BABYLON.ShadowGenerator.QUALITY_LOW;
 
   // Assets Manager
-  // var assetsManager = new BABYLON.AssetsManager(scene);
-  // var meshTask = assetsManager.addMeshTask("loadMesh", "", "public/assets/", "solus_knight.gltf");
-  //
-  // meshTask.onSuccess = function (task) {
-  //   task.loadedMeshes.forEach((item, i) => {
-  //     item.position = BABYLON.Vector3.Zero();
-  //     item.addRotation(0, Math.PI, 0);
-  //     item.translate(new BABYLON.Vector3(0, 1, 0).normalize(), -0.85, BABYLON.Space.LOCAL);
-  //     item.parent = myPlayer;
-  //   });
-  //
-  //   console.log("Mesh loaded!");
-  //   console.log(scene.animationGroups);
-  //   // scene.stopAllAnimations();
-  //   scene.getAnimationGroupByName("knight_idle").play(true);
-  // }
-  //
-  // meshTask.onError = function (task, message, exception) {
-  //     console.log(message, exception);
-  // }
-  //
-  // assetsManager.onFinish = function (tasks) {
-  // 	engine.runRenderLoop(function () {
-  // 		scene.render();
-  // 	});
-  // };
-  //
-  // // myPlayer.isVisible = false;
-  // myMaterial.alpha = 0.6;
-  //
-  // assetsManager.load();
+  var assetsManager = new BABYLON.AssetsManager(scene);
+  var meshTask = assetsManager.addMeshTask("loadMesh", "", "public/assets/", "Minotaur.obj");
 
-  myGround.physicsImpostor = new BABYLON.PhysicsImpostor(myGround, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.1 }, scene);
+  meshTask.onSuccess = function (task) {
+    task.loadedMeshes.forEach((item, i) => {
+      item.position = BABYLON.Vector3.Zero();
+      item.addRotation(0, Math.PI, 0);
+      // item.translate(new BABYLON.Vector3(0, 1, 0).normalize(), -0.2, BABYLON.Space.LOCAL);
+      item.scaling = new BABYLON.Vector3(0.02, 0.02, 0.02);
+      if(item.name == "Body_mesh") {
+        item.material = playerTorsoMaterial;
+      }
+      else {
+        item.material = playerLegsMaterial;
+      }
+      item.parent = myPlayer;
+      console.log(item.name);
+    });
+    // Eyes_mesh Body_mesh Teeth_mesh Pants_mesh
+
+    console.log(task.loadedMeshes);
+    // console.log(scene.animationGroups);
+    // scene.stopAllAnimations();
+    // scene.getAnimationGroupByName("knight_idle").play(true);
+  }
+
+  meshTask.onError = function (task, message, exception) {
+      console.log(message, exception);
+  }
+
+  assetsManager.onFinish = function (tasks) {
+  	engine.runRenderLoop(function () {
+  		scene.render();
+  	});
+  };
+
+  myPlayer.isVisible = false;
+  // myMaterial.alpha = 0.6;
+
+  assetsManager.load();
+
+  myGround.physicsImpostor = new BABYLON.PhysicsImpostor(myGround, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.1, friction: 0.1 }, scene);
   // var myEnemy = BABYLON.MeshBuilder.CreateCylinder("cylinder", {height: 2, diameterTop: 1, diameterBottom: 1.5}, scene);
   // myEnemy.position = new BABYLON.Vector3(1, 2, 0);
   // myEnemy.physicsImpostor = new BABYLON.PhysicsImpostor(myEnemy, BABYLON.PhysicsImpostor.CylinderImpostor, { mass: 2, restitution: 0.1 }, scene);
