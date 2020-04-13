@@ -33,6 +33,7 @@ var createScene = function (engine, canvas, playerInfo) {
   var playerLegsMaterial = new BABYLON.StandardMaterial("playerMaterial", scene);
   playerLegsMaterial.diffuseColor = new BABYLON.Color3(0, 1, 0);
 
+  // The player
   var myPlayer = createPlayer(scene, myMaterial, {x: playerInfo.x, y: playerInfo.y, z: playerInfo.z}, playerInfo.playerId, playerInfo.rotation);
 
   // var enemyPlayer = createPlayer(scene, myMaterial, {x: -10, y: 3, z: 0});

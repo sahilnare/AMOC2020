@@ -6,6 +6,7 @@ function babylonInit(socket) {
   var scene;
   var playersArray = [];
 
+  // Sendind data of all players currently online to the player
   socket.on('currentPlayers', function (players) {
     let myFirstPromise = new Promise((resolve, reject) => {
       Object.keys(players).forEach(function (id) {
@@ -38,6 +39,7 @@ function babylonInit(socket) {
 
   });
 
+  // Sendind movement data of the player that moved to all the players
   socket.on('playerMoved', function (playerInfo) {
     scene.getMeshByName(playerInfo.playerId).position = new BABYLON.Vector3(playerInfo.x, playerInfo.y, playerInfo.z);
     // scene.getMeshByName(playerInfo.playerId).rotation = new BABYLON.Vector3(playerInfo.rotation.x, playerInfo.rotation.y, playerInfo.rotation.z);
@@ -47,6 +49,7 @@ function babylonInit(socket) {
     scene.getMeshByName(playerInfo.playerId).rotationQuaternion = BABYLON.Quaternion.RotationYawPitchRoll(playerInfo.rotation.y, 0, 0);
   });
 
+  // Sendind data of the new player to all the players
   socket.on('newPlayer', function (playerInfo) {
     // addOtherPlayers(self, playerInfo);
     playerInfo.rotation = new BABYLON.Vector3(0, 0, 0);
@@ -58,6 +61,7 @@ function babylonInit(socket) {
     // console.log("Scene Meshes", scene.meshes);
   });
 
+  // When the player is disconnected
   this.socket.on('disconnect', function (playerId) {
     playersArray.forEach(function (otherPlayer) {
       if (playerId === otherPlayer.playerId) {
