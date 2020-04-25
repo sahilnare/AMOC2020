@@ -1,4 +1,17 @@
 
+var createStartScreen = function(engine, canvas) {
+  var scene = new BABYLON.Scene(engine);
+  var camera = new BABYLON.ArcRotateCamera(
+    "Camera",
+    Math.PI / 2,
+    Math.PI / 2,
+    2,
+    BABYLON.Vector3.Zero(),
+    scene
+  );
+  return scene;
+}
+
 /******* Add the create scene function ******/
 var createScene = function (engine, canvas, playerInfo) {
   // Create the scene space
@@ -18,23 +31,43 @@ var createScene = function (engine, canvas, playerInfo) {
   var physicsPlugin = new BABYLON.CannonJSPlugin();
   scene.enablePhysics(gravityVector, physicsPlugin);
 
+  // GUI
+  // var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+  //
+  // var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Click Me");
+  // button1.width = "150px"
+  // button1.height = "40px";
+  // button1.color = "white";
+  // button1.cornerRadius = 20;
+  // button1.background = "green";
+  // button1.onPointerUpObservable.add(function() {
+  //     alert("you did it!");
+  // });
+  // advancedTexture.addControl(button1);
+
   // Add and manipulate meshes in the scene
   // Add material to the meshes
 
-  var myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
-  myMaterial.diffuseColor = new BABYLON.Color3(0, 0, 1);
-  myMaterial.specularColor = new BABYLON.Color3(1, 0, 0);
-  myMaterial.emissiveColor = new BABYLON.Color3(0.3, 0, 0);
-  myMaterial.ambientColor = new BABYLON.Color3(0, 0.3, 0);
+  // var myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
+  // myMaterial.diffuseColor = new BABYLON.Color3(0, 0, 1);
+  // myMaterial.specularColor = new BABYLON.Color3(1, 0, 0);
+  // myMaterial.emissiveColor = new BABYLON.Color3(0.3, 0, 0);
+  // myMaterial.ambientColor = new BABYLON.Color3(0, 0.3, 0);
 
   var playerTorsoMaterial = new BABYLON.StandardMaterial("playerMaterial", scene);
-  playerTorsoMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
+  playerTorsoMaterial.diffuseColor = new BABYLON.Color3(0.9, 0, 0);
+  playerTorsoMaterial.specularColor = new BABYLON.Color3(0.7, 0.2, 0);
+  // playerTorsoMaterial.emissiveColor = new BABYLON.Color3(0.3, 0, 0);
+  // playerTorsoMaterial.ambientColor = new BABYLON.Color3(0, 0.3, 0);
 
   var playerLegsMaterial = new BABYLON.StandardMaterial("playerMaterial", scene);
   playerLegsMaterial.diffuseColor = new BABYLON.Color3(0, 1, 0);
+  playerTorsoMaterial.specularColor = new BABYLON.Color3(0.2, 0.7, 0);
+  // playerLegsMaterial.emissiveColor = new BABYLON.Color3(0.3, 0, 0);
+  // playerLegsMaterial.ambientColor = new BABYLON.Color3(0, 0.3, 0);
 
   // The player
-  var myPlayer = createPlayer(scene, myMaterial, {x: playerInfo.x, y: playerInfo.y, z: playerInfo.z}, playerInfo.playerId, playerInfo.rotation);
+  var myPlayer = createPlayer(scene, {x: playerInfo.x, y: playerInfo.y, z: playerInfo.z}, playerInfo.playerId, playerInfo.rotation);
 
   // var enemyPlayer = createPlayer(scene, myMaterial, {x: -10, y: 3, z: 0});
 
@@ -92,7 +125,7 @@ var createScene = function (engine, canvas, playerInfo) {
     task.loadedMeshes.forEach((item, i) => {
       item.position = BABYLON.Vector3.Zero();
       item.addRotation(0, Math.PI, 0);
-      // item.translate(new BABYLON.Vector3(0, 1, 0).normalize(), -0.2, BABYLON.Space.LOCAL);
+      item.translate(new BABYLON.Vector3(0, 1, 0).normalize(), -0.3, BABYLON.Space.LOCAL);
       item.scaling = new BABYLON.Vector3(0.02, 0.02, 0.02);
       if(item.name == "Body_mesh") {
         item.material = playerTorsoMaterial;

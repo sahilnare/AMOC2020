@@ -30,7 +30,7 @@ function babylonInit(socket) {
         if (players[id].playerId !== socket.id) {
           players[id].rotation = new BABYLON.Vector3(0, 0, 0);
           console.log("Other Player", players[id]);
-          var newPlayer = createPlayer(scene, scene.getMaterialByName("myMaterial"), {x: players[id].x, y: players[id].y, z: players[id].z}, players[id].playerId, players[id].rotation);
+          var newPlayer = createPlayer(scene, {x: players[id].x, y: players[id].y, z: players[id].z}, players[id].playerId, players[id].rotation);
           meshInstance(scene, players[id].playerId);
           playersArray.push(players[id]);
         }
@@ -53,7 +53,7 @@ function babylonInit(socket) {
   socket.on('newPlayer', function (playerInfo) {
     // addOtherPlayers(self, playerInfo);
     playerInfo.rotation = new BABYLON.Vector3(0, 0, 0);
-    var newPlayer = createPlayer(scene, scene.getMaterialByName("myMaterial"), {x: playerInfo.x, y: playerInfo.y, z: playerInfo.z}, playerInfo.playerId, playerInfo.rotation);
+    var newPlayer = createPlayer(scene, {x: playerInfo.x, y: playerInfo.y, z: playerInfo.z}, playerInfo.playerId, playerInfo.rotation);
     meshInstance(scene, playerInfo.playerId);
     playersArray.push(playerInfo);
     console.log("New Player", playerInfo);
@@ -78,8 +78,7 @@ function babylonInit(socket) {
 
 }
 
-
-function startEngine(scene, engine) {
+function startEngine(scene, startScreen, engine) {
   // Register a render loop to repeatedly render the scene
   engine.displayLoadingUI();
   scene.executeWhenReady(function () {
